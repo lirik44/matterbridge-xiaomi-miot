@@ -5,9 +5,10 @@ import { findSpec, supportedModels } from '../specs/index.js';
 import type { ResolvedDeviceConfig } from '../config.js';
 
 import { AirPurifierAccessory } from './air_purifier.js';
+import type { MiotAccessory } from './base.js';
 import { FanAccessory } from './fan.js';
 import { LightAccessory } from './light.js';
-import type { MiotAccessory } from './base.js';
+import { VacuumAccessory } from './vacuum.js';
 
 /**
  * Creates the accessory matching the model of a configured device.
@@ -22,19 +23,29 @@ import type { MiotAccessory } from './base.js';
  */
 export async function createAccessory(config: ResolvedDeviceConfig, log: AnsiLogger): Promise<MiotAccessory> {
   const model = config.model ?? (await probeModel(config, log));
-  const spec = findSpec(model);
+  const match = findSpec(model);
 
-  if (!spec) {
+  if (!match) {
     throw new Error(`Device "${config.name}" has the unsupported model "${model ?? 'unknown'}". Supported models: ${supportedModels().join(', ')}.`);
   }
 
+  if (match.guessed) {
+    log.warn(`${config.name} | ${model} is not listed explicitly; using the ${match.spec.model} mapping of its family. Please report whether it works.`);
+  }
+
+  // Remember the model that was resolved, so the endpoints carry the real one.
+  const resolved: ResolvedDeviceConfig = { ...config, model };
+  const { spec } = match;
+
   switch (spec.kind) {
     case 'fan':
-      return new FanAccessory(spec, config, log);
+      return new FanAccessory(spec, resolved, log);
     case 'air-purifier':
-      return new AirPurifierAccessory(spec, config, log);
+      return new AirPurifierAccessory(spec, resolved, log);
     case 'light':
-      return new LightAccessory(spec, config, log);
+      return new LightAccessory(spec, resolved, log);
+    case 'vacuum':
+      return new VacuumAccessory(spec, resolved, log);
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "matterbridge-xiaomi-miot",
   "version": "0.1.0",
-  "description": "Matterbridge plugin for Xiaomi MIoT devices (fans, air purifiers) over the local miIO protocol",
+  "description": "Matterbridge plugin for Xiaomi MIoT devices: fans, air purifiers, lamps and Dreame robot vacuums over the local miIO protocol",
   "author": "https://github.com/lirik44",
   "homepage": "https://github.com/lirik44/matterbridge-xiaomi-miot/blob/main/README.md",
   "license": "Apache-2.0",
@@ -37,7 +37,13 @@
     "apple-home",
     "google-home",
     "alexa",
-    "homeassistant"
+    "homeassistant",
+    "dreame",
+    "vacuum",
+    "robot-vacuum",
+    "robotic-vacuum-cleaner",
+    "light",
+    "yeelight"
   ],
   "scripts": {
     "start": "matterbridge",

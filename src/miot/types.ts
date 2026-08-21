@@ -20,7 +20,7 @@ export interface MiotAction {
 }
 
 /** The kind of device, which decides how the device is exposed over Matter. */
-export type DeviceKind = 'fan' | 'air-purifier' | 'light';
+export type DeviceKind = 'fan' | 'air-purifier' | 'light' | 'vacuum';
 
 /** Fields shared by every device specification. */
 interface CommonSpec {
@@ -146,8 +146,81 @@ export interface LightSpec extends CommonSpec {
   scenes?: { name: string; value: number }[];
 }
 
+/**
+ * The state of a robot vacuum, normalised across models.
+ *
+ * Every model reports its own `device_status` enum, which the specification maps
+ * onto these values.
+ */
+export type VacuumState = 'idle' | 'sleeping' | 'cleaning' | 'mopping' | 'manual-cleaning' | 'paused' | 'returning' | 'charging' | 'fully-charged' | 'error';
+
+/**
+ * How a cleaning level is presented to a controller.
+ *
+ * These are the Matter `RvcCleanMode` mode tags, spelled without the Matter
+ * dependency so that specifications stay free of Matter imports.
+ */
+export type CleanModeTag = 'lowNoise' | 'min' | 'day' | 'max' | 'night' | 'quick' | 'deepClean' | 'vacuum' | 'mop';
+
+/** The levels one cleaning dimension (suction or water flow) supports. */
+export interface CleanLevels {
+  /**
+   * The value written when the other dimension takes over, e.g. the water flow
+   * written when a vacuum-only mode is selected. `null` when the device has no
+   * such value, in which case the level is left untouched.
+   */
+  off: number | null;
+  /** The selectable levels, in ascending order. */
+  modes: { name: string; value: number; tag: CleanModeTag }[];
+}
+
+/** A robot vacuum, exposed as a Matter robotic vacuum cleaner. */
+export interface VacuumSpec extends CommonSpec {
+  kind: 'vacuum';
+  props: {
+    /** Device status, see `statusValues`. */
+    status: MiotProp;
+    /** Fault code, `0` meaning no fault. */
+    fault?: MiotProp;
+    /** Battery level, in percent. */
+    battery: MiotProp;
+    /** Charging state, see `chargingValues`. */
+    chargingState: MiotProp;
+    /** Operating mode. Read for diagnostics only. */
+    operatingMode?: MiotProp;
+    /** Suction level, see `vacuumLevels`. */
+    cleaningMode?: MiotProp;
+    /** Water flow level, see `mopLevels`. */
+    waterFlow?: MiotProp;
+    /** Whether the water tank is attached. */
+    waterBoxStatus?: MiotProp;
+  };
+  actions: {
+    /** Starts a full clean. */
+    startClean: MiotAction;
+    /** Stops the current clean. */
+    stopClean: MiotAction;
+    /** Sends the robot back to its dock. */
+    home: MiotAction;
+    /** Makes the robot announce its position. */
+    locate?: MiotAction;
+    /** Pauses in place. Falls back to `stopClean` when the model has none. */
+    pause?: MiotAction;
+  };
+  /** Maps the `status` values of the model onto the normalised states. */
+  statusValues: Record<number, VacuumState>;
+  /** Maps the `chargingState` values of the model onto "is charging". */
+  chargingValues: Record<number, boolean>;
+  /** The suction levels of the model. */
+  vacuumLevels?: CleanLevels;
+  /** The water flow levels of the model. */
+  mopLevels?: CleanLevels;
+  /** Whether the model can be told to clean individual rooms over MIoT. */
+  roomCleaning?: boolean;
+}
+
 /** Any supported device specification. */
-export type DeviceSpec = FanSpec | AirPurifierSpec | LightSpec;
+export type DeviceSpec = FanSpec | AirPurifierSpec | LightSpec | VacuumSpec;
 
 /** The result of a single property in a `get_properties` response. */
 export interface MiotPropertyResult {

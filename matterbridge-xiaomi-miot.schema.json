@@ -1,6 +1,6 @@
 {
   "title": "Matterbridge Xiaomi MIoT",
-  "description": "Xiaomi fans, air purifiers and lamps over the local miIO/MIoT protocol",
+  "description": "Xiaomi fans, air purifiers, lamps and Dreame robot vacuums over the local miIO/MIoT protocol",
   "type": "object",
   "required": ["devices"],
   "properties": {
@@ -103,6 +103,22 @@
             "type": "boolean",
             "default": false
           },
+          "roomIds": {
+            "description": "Vacuum: segment ids of the rooms to expose as service areas. Dreame robots cannot report their room list over MIoT, so list the ids from the Xiaomi Home app here.",
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "default": []
+          },
+          "roomNames": {
+            "description": "Vacuum: room names, in the same order as roomIds. Defaults to \"Room <id>\".",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
           "debug": {
             "description": "Debug logging for this device only.",
             "type": "boolean",
@@ -122,13 +138,17 @@
     "whiteList": {
       "description": "Only expose the devices listed here. Leave empty to expose all of them.",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "blackList": {
       "description": "Never expose the devices listed here.",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "debug": {

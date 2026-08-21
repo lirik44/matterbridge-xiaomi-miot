@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Dreame robot vacuums (`dreame.vacuum.p2008`/`p2009`/`p2028`/`p2041o`/`p2150a`/`p2150o`, with a
+  family fallback for unlisted models) exposed as Matter robotic vacuum cleaners: start, stop,
+  pause, resume, return to dock, suction and mop levels as clean modes, battery state and the
+  rooms declared through `roomIds`/`roomNames`.
+
 ## [0.1.0] - 2026-08-21
 
 Initial release.

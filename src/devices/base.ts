@@ -54,6 +54,8 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
 
   protected serialNumber = '';
   protected firmware = 'Unknown';
+  /** The MIoT model of this device, which may be a family member of the specification. */
+  protected readonly model: string;
 
   constructor(
     protected readonly spec: S,
@@ -61,6 +63,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
     protected readonly log: AnsiLogger,
   ) {
     this.client = new MiotClient({ name: config.name, ip: config.ip, token: config.token, log });
+    this.model = config.model ?? spec.model;
   }
 
   /** @returns {string} The device name as configured. */
@@ -89,7 +92,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
     this.firmware = info?.fw_ver ?? 'Unknown';
     this.serialNumber = this.resolveSerialNumber(info?.mac);
 
-    this.log.info(`${this.name} | ${this.spec.displayName} (${this.spec.model}) serial ${this.serialNumber} firmware ${this.firmware}`);
+    this.log.info(`${this.name} | ${this.spec.displayName} (${this.model}) serial ${this.serialNumber} firmware ${this.firmware}`);
 
     this.buildEndpoints();
     return this.endpoints;
@@ -194,7 +197,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
    */
   protected async writeProp(propName: string, value: MiotValue): Promise<void> {
     const prop = (this.spec.props as Record<string, MiotProp | undefined>)[propName];
-    if (!prop) throw new Error(`${this.spec.model} has no property "${propName}"`);
+    if (!prop) throw new Error(`${this.model} has no property "${propName}"`);
     await this.client.setProperty(propName, prop, value);
   }
 
@@ -246,14 +249,28 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
     const name = label ? `${this.name} ${label}` : this.name;
     const serial = serialSuffix ? `${this.serialNumber}-${serialSuffix}` : this.serialNumber;
     return createBridgedEndpoint(deviceTypes, {
-      id: `${this.spec.model}-${serial}`,
+      id: `${this.model}-${serial}`,
       name,
       serial,
       productName: this.spec.displayName,
       firmware: this.firmware,
-      model: this.spec.model,
+      model: this.model,
       debug: this.config.debug,
     });
+  }
+
+  /**
+   * Stamps this device's identity onto an endpoint built elsewhere, such as the
+   * Matterbridge robotic vacuum cleaner device class.
+   *
+   * @param {MatterbridgeEndpoint} endpoint The endpoint to stamp.
+   */
+  protected applyIdentity(endpoint: MatterbridgeEndpoint): void {
+    endpoint.vendorName = VENDOR_NAME;
+    endpoint.productName = this.spec.displayName;
+    endpoint.productUrl = PRODUCT_URL;
+    endpoint.hardwareVersionString = this.model;
+    endpoint.softwareVersionString = this.firmware;
   }
 
   /**
@@ -268,7 +285,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
    */
   protected addBoundSwitch(propName: string, label: string, serialSuffix: string, values: { on: MiotValue; off: MiotValue } = { on: true, off: false }): void {
     if (!this.has(propName)) {
-      this.log.debug(`${this.name} | ${this.spec.model} has no "${propName}" property, skipping the ${label} switch`);
+      this.log.debug(`${this.name} | ${this.model} has no "${propName}" property, skipping the ${label} switch`);
       return;
     }
     const endpoint = this.createSwitchEndpoint(label, serialSuffix);
@@ -285,7 +302,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
    */
   protected addEnumSwitches(propName: string, options: { label: string; value: number; serialSuffix: string }[], momentary = false): void {
     if (!this.has(propName)) {
-      this.log.debug(`${this.name} | ${this.spec.model} has no "${propName}" property, skipping its switches`);
+      this.log.debug(`${this.name} | ${this.model} has no "${propName}" property, skipping its switches`);
       return;
     }
     for (const option of options) {

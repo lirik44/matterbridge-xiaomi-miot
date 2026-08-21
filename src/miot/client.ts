@@ -23,6 +23,15 @@ const PROPS_PER_CALL = 10;
 const RECONNECT_DELAY_MS = 10_000;
 
 /**
+ * Handshake options.
+ *
+ * Deliberately more impatient than the `miio-api` defaults (3 attempts, 3 s
+ * apart): a device that is offline at startup must not hold up the plugin, and
+ * the polling loop reconnects anyway.
+ */
+const HANDSHAKE_OPTIONS = { attempts: 2, delay: 1000, timeout: 3000 };
+
+/**
  * A thin MIoT client on top of the local miIO protocol.
  *
  * The client owns a single `miio-api` device, re-creating it whenever the
@@ -57,7 +66,7 @@ export class MiotClient {
     if (this.destroyed) throw new Error('The client has been destroyed');
 
     this.connecting ??= miio
-      .device({ address: this.options.ip, token: this.options.token })
+      .device({ address: this.options.ip, token: this.options.token }, HANDSHAKE_OPTIONS)
       .then((device) => {
         this.device = device;
         this.log.info(`Connected to ${this.options.name} at ${this.options.ip} (did ${device.id})`);

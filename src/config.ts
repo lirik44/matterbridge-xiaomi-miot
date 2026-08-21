@@ -38,6 +38,16 @@ export interface DeviceConfig {
   /** Expose the built-in scenes as momentary switches (light only). */
   sceneControl?: boolean;
 
+  /**
+   * Vacuum: the segment ids of the rooms to expose as service areas.
+   *
+   * Dreame robots cannot report their room list over MIoT — the map is an opaque
+   * blob — so the ids have to be declared here. Find them in the Xiaomi Home app.
+   */
+  roomIds?: number[];
+  /** Vacuum: the room names, applied in the same order as `roomIds`. */
+  roomNames?: string[];
+
   /** Expose air quality, temperature and humidity (air purifier only). */
   sensorsControl?: boolean;
   /** Expose the HEPA filter condition (air purifier only). */
@@ -72,9 +82,11 @@ export interface XiaomiMiotPlatformConfig extends PlatformConfig {
 }
 
 /** A device configuration with every optional field resolved. */
-export type ResolvedDeviceConfig = Required<Omit<DeviceConfig, 'model' | 'deviceId'>> & {
+export type ResolvedDeviceConfig = Required<Omit<DeviceConfig, 'model' | 'deviceId' | 'roomIds' | 'roomNames'>> & {
   model?: string;
   deviceId?: string | number;
+  roomIds?: number[];
+  roomNames?: string[];
 };
 
 /** The default polling interval, in seconds. */

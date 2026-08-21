@@ -1,7 +1,8 @@
 # matterbridge-xiaomi-miot
 
 A [Matterbridge](https://github.com/Luligu/matterbridge) plugin that exposes Xiaomi
-fans, air purifiers and lamps over Matter, talking to them **locally** over the
+fans, air purifiers, lamps and Dreame robot vacuums over Matter, talking to them
+**locally** over the
 miIO/MIoT protocol. No Mi Cloud account and no internet access are needed — only
 the device IP address and its token.
 
@@ -12,12 +13,17 @@ be copied over almost verbatim.
 
 ## Supported models
 
-| Model                 | Product                         | Exposed as                                                                                |
-| --------------------- | ------------------------------- | ----------------------------------------------------------------------------------------- |
-| `dmaker.fan.p18`      | Mi Smart Fan 2                  | Fan (on/off, speed 1–100 %, oscillation, natural wind)                                    |
-| `zhimi.airp.vb4`      | Xiaomi Smart Air Purifier 4 Pro | Air purifier + air quality sensor (PM2.5, PM10, temperature, humidity) + HEPA filter life |
-| `zhimi.airp.mb5`      | Xiaomi Smart Air Purifier 4     | Air purifier + air quality sensor (PM2.5, temperature, humidity) + HEPA filter life       |
-| `yeelink.light.lamp4` | Mi LED Desk Lamp 1S             | Color temperature light (on/off, brightness, 2600–5000 K)                                 |
+| Model                                                            | Product                               | Exposed as                                                                                |
+| ---------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `dmaker.fan.p18`                                                 | Mi Smart Fan 2                        | Fan (on/off, speed 1–100 %, oscillation, natural wind)                                    |
+| `zhimi.airp.vb4`                                                 | Xiaomi Smart Air Purifier 4 Pro       | Air purifier + air quality sensor (PM2.5, PM10, temperature, humidity) + HEPA filter life |
+| `zhimi.airp.mb5`                                                 | Xiaomi Smart Air Purifier 4           | Air purifier + air quality sensor (PM2.5, temperature, humidity) + HEPA filter life       |
+| `yeelink.light.lamp4`                                            | Mi LED Desk Lamp 1S                   | Color temperature light (on/off, brightness, 2600–5000 K)                                 |
+| `dreame.vacuum.p2008` `p2009` `p2028` `p2041o` `p2150a` `p2150o` | Dreame F9 / D9 / Z10 Pro and siblings | Robotic vacuum cleaner (start/stop/pause/dock, suction and mop levels, battery, rooms)    |
+
+An unlisted `dreame.vacuum.*` model falls back to the F9 mapping, since Dreame
+publishes near-identical specifications across its vacuum line; the plugin logs
+that it is guessing.
 
 Adding a model is a single file: look its specification up on
 [home.miot-spec.com](https://home.miot-spec.com/), write the `siid`/`piid`
@@ -85,6 +91,8 @@ Then configure the plugin in the Matterbridge frontend, or edit
 | `modeControl`      | `false`    | Expose the operating modes as switches (purifier: auto/sleep/favorite/manual, fan: straight/natural wind).              |
 | `ionizerControl`   | `false`    | Air purifier: expose the ionizer as a switch.                                                                           |
 | `sceneControl`     | `false`    | Light: expose the built-in scenes as momentary switches.                                                                |
+| `roomIds`          | –          | Vacuum: segment ids of the rooms to expose as service areas.                                                            |
+| `roomNames`        | –          | Vacuum: room names, in the same order as `roomIds`.                                                                     |
 | `debug`            | `false`    | Debug logging for this device only.                                                                                     |
 
 Every enabled `*Control` flag adds one more bridged device, which shows up as its
@@ -112,6 +120,26 @@ temperature and humidity.
 
 **Light** — on/off, brightness and color temperature between 2600 K and 5000 K.
 
+**Robot vacuum** — start, stop, pause, resume and return to dock; the suction
+levels (Quiet/Standard/Strong/Turbo) followed by the mop levels
+(Light/Medium/High) as clean modes; the battery with its charging state; and the
+rooms declared in `roomIds` as service areas.
+
+```json
+{
+  "name": "Vacuum",
+  "ip": "192.168.1.60",
+  "token": "................................",
+  "model": "dreame.vacuum.p2008",
+  "roomIds": [16, 17, 18],
+  "roomNames": ["Kitchen", "Bedroom", "Hallway"]
+}
+```
+
+A robot vacuum is exposed as its own Matter node rather than through the bridge —
+Apple Home and Google Home both refuse to show a bridged one — so it is paired
+separately, with its own QR code from the Matterbridge frontend.
+
 ## Apple Home notes
 
 Apple Home does not render the child endpoints of a composed device, which is why
@@ -134,6 +162,10 @@ explicit switches (`modeControl: true`).
 - Devices are polled; Xiaomi devices do not push state changes over the local
   protocol. A change made on the device itself shows up within one polling
   interval.
+- Dreame vacuums keep their map as an opaque blob over MIoT, so rooms cannot be
+  discovered automatically (hence `roomIds`), and selecting rooms in the
+  controller cannot start a room-only clean: the plugin warns and runs a full
+  clean instead.
 
 ## Development
 
@@ -150,7 +182,7 @@ matterbridge -add .
 Re-run `npm run dev:matterbridge` after any `npm install`, which prunes unsaved
 packages.
 
-To *run* a bridge from this working copy, link the very same installation the
+To _run_ a bridge from this working copy, link the very same installation the
 bridge itself runs from (`npm link matterbridge`, or a symlink into the global
 `node_modules`). Two separate copies of `matterbridge` — one for the host, one in
 this folder — make the host reject the plugin with `does not export a valid
