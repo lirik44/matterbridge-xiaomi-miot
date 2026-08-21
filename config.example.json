@@ -1,0 +1,37 @@
+{
+  "name": "matterbridge-xiaomi-miot",
+  "type": "DynamicPlatform",
+  "debug": false,
+  "unregisterOnShutdown": false,
+  "pollingInterval": 10,
+  "devices": [
+    {
+      "name": "Fan",
+      "ip": "192.168.1.46",
+      "token": "<32-hex-token>",
+      "deviceId": "456381061",
+      "model": "dmaker.fan.p18"
+    },
+    {
+      "name": "Air Purifier Pro",
+      "ip": "192.168.1.147",
+      "token": "<32-hex-token>",
+      "deviceId": "682252461",
+      "model": "zhimi.airp.vb4"
+    },
+    {
+      "name": "Air Purifier",
+      "ip": "192.168.1.163",
+      "token": "<32-hex-token>",
+      "deviceId": "683908207",
+      "model": "zhimi.airp.mb5"
+    },
+    {
+      "name": "Desk Lamp",
+      "ip": "192.168.1.152",
+      "token": "<32-hex-token>",
+      "deviceId": "405205485",
+      "model": "yeelink.light.lamp4"
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "title": "Matterbridge Xiaomi MIoT",
+  "description": "Xiaomi fans, air purifiers and lamps over the local miIO/MIoT protocol",
+  "type": "object",
+  "required": ["devices"],
+  "properties": {
+    "name": {
+      "description": "Plugin name",
+      "type": "string",
+      "readOnly": true,
+      "ui:widget": "hidden"
+    },
+    "type": {
+      "description": "Plugin type",
+      "type": "string",
+      "readOnly": true,
+      "ui:widget": "hidden"
+    },
+    "devices": {
+      "description": "The Xiaomi devices to expose over Matter.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name shown in the controller app.",
+            "type": "string"
+          },
+          "ip": {
+            "description": "The device IP address. Give the device a static lease on your router.",
+            "type": "string"
+          },
+          "token": {
+            "description": "The 32 character device token. Extract it with https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor",
+            "type": "string"
+          },
+          "model": {
+            "description": "The MIoT model, e.g. dmaker.fan.p18. Leave empty to ask the device.",
+            "type": "string"
+          },
+          "deviceId": {
+            "description": "(Optional) The Xiaomi device id. Used as the Matter serial number, so setting it keeps the device identity stable.",
+            "type": "string"
+          },
+          "pollingInterval": {
+            "description": "How often the device is polled, in seconds.",
+            "type": "number",
+            "default": 10
+          },
+          "deviceEnabled": {
+            "description": "Expose this device.",
+            "type": "boolean",
+            "default": true
+          },
+          "sensorsControl": {
+            "description": "Air purifier: expose air quality, PM2.5/PM10, temperature and humidity.",
+            "type": "boolean",
+            "default": true
+          },
+          "separateSensors": {
+            "description": "Air purifier: expose the sensors as their own device instead of child endpoints. Required for Apple Home.",
+            "type": "boolean",
+            "default": true
+          },
+          "filterControl": {
+            "description": "Air purifier: expose the remaining HEPA filter life.",
+            "type": "boolean",
+            "default": true
+          },
+          "speedControl": {
+            "description": "Air purifier: what the speed slider drives. \"favorite\" gives 12 steps, \"levels\" the 3 manual fan levels.",
+            "type": "string",
+            "enum": ["favorite", "levels"],
+            "default": "favorite"
+          },
+          "buzzerControl": {
+            "description": "Expose the beeper as a switch.",
+            "type": "boolean",
+            "default": false
+          },
+          "ledControl": {
+            "description": "Expose the display/indicator light as a switch.",
+            "type": "boolean",
+            "default": false
+          },
+          "childLockControl": {
+            "description": "Expose the physical controls lock as a switch.",
+            "type": "boolean",
+            "default": false
+          },
+          "modeControl": {
+            "description": "Expose the operating modes as switches (air purifier: auto/sleep/favorite/manual, fan: straight/natural wind).",
+            "type": "boolean",
+            "default": false
+          },
+          "ionizerControl": {
+            "description": "Air purifier: expose the ionizer as a switch.",
+            "type": "boolean",
+            "default": false
+          },
+          "sceneControl": {
+            "description": "Light: expose the built-in scenes as momentary switches. Not available on lamps that only speak the legacy Yeelight protocol.",
+            "type": "boolean",
+            "default": false
+          },
+          "debug": {
+            "description": "Debug logging for this device only.",
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": ["name", "ip", "token"]
+      },
+      "minItems": 1,
+      "default": []
+    },
+    "pollingInterval": {
+      "description": "The default polling interval for devices that do not set their own, in seconds.",
+      "type": "number",
+      "default": 10
+    },
+    "whiteList": {
+      "description": "Only expose the devices listed here. Leave empty to expose all of them.",
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "blackList": {
+      "description": "Never expose the devices listed here.",
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "debug": {
+      "description": "Capture debug-level logging from this plugin, overriding the Matterbridge global log level setting.",
+      "type": "boolean",
+      "default": false
+    },
+    "unregisterOnShutdown": {
+      "description": "Unregister all exposed devices on shutdown (used for development/testing).",
+      "type": "boolean",
+      "default": false,
+      "ui:widget": "hidden"
+    }
+  }
+}

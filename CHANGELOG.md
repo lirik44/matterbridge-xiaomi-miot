@@ -1,0 +1,20 @@
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+## [0.1.0] - 2026-08-21
+
+Initial release.
+
+### Added
+
+- Local MIoT/miIO client with automatic reconnection, no Mi Cloud account needed.
+- `dmaker.fan.p18` (Mi Smart Fan 2) exposed as a Matter fan: on/off, 1–100 % speed,
+  horizontal oscillation and the natural wind mode.
+- `zhimi.airp.vb4` (Air Purifier 4 Pro) and `zhimi.airp.mb5` (Air Purifier 4) exposed as
+  Matter air purifiers with air quality, PM2.5, PM10 (Pro), temperature, humidity and
+  HEPA filter life.
+- `yeelink.light.lamp4` (Mi LED Desk Lamp 1S) exposed as a Matter color temperature light,
+  driven over the legacy Yeelight protocol because its firmware rejects MIoT calls.
+- Optional switch endpoints for the beeper, display, child lock, ionizer, operating modes
+  and light scenes, named after the `homebridge-miot` flags so configurations can be copied.
