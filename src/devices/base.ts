@@ -18,6 +18,9 @@ export const PRODUCT_URL = 'https://github.com/lirik44/matterbridge-xiaomi-miot'
 /** How long a momentary switch stays on before it resets itself, in milliseconds. */
 const MOMENTARY_RESET_MS = 1000;
 
+/** How many consecutive failed polls it takes to call a device unreachable. */
+const FAILURES_BEFORE_UNREACHABLE = 3;
+
 /** A switch endpoint bound to a boolean or enum MIoT property. */
 interface BoundSwitch {
   endpoint: MatterbridgeEndpoint;
@@ -51,6 +54,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
   private polling = false;
   private stopped = false;
   private reachable = false;
+  private consecutiveFailures = 0;
 
   protected serialNumber = '';
   protected firmware = 'Unknown';
@@ -158,6 +162,7 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
     this.polling = true;
     try {
       this.state = await this.readState();
+      this.consecutiveFailures = 0;
       if (!this.reachable) {
         this.log.info(`${this.name} | is reachable again`);
         this.reachable = true;
@@ -165,8 +170,12 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
       await this.applyState();
       await this.applySwitchState();
     } catch (error) {
-      if (this.reachable) {
-        this.log.warn(`${this.name} | poll failed: ${String(error)}`);
+      this.consecutiveFailures++;
+      // A single timeout is routine — a device asleep on its dock or busy with
+      // its own radio misses one read and answers the next. Only a run of them
+      // means the device is really gone.
+      if (this.reachable && this.consecutiveFailures >= FAILURES_BEFORE_UNREACHABLE) {
+        this.log.warn(`${this.name} | unreachable after ${this.consecutiveFailures} failed polls: ${String(error)}`);
         this.reachable = false;
       } else {
         this.log.debug(`${this.name} | poll failed: ${String(error)}`);
