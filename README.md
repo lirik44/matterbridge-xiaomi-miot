@@ -222,8 +222,9 @@ a bare number rather than a percentage, and the oscillation lives in the accesso
 HomeKit has dedicated characteristics for them.
 
 State changes made on the device itself appear after the next poll — Matter has no way for a controller to ask for a
-fresh reading, unlike HomeKit. Lower `pollingInterval` if the default 10 seconds feels sluggish: 1 second is accepted and
-comfortable for mains-powered devices, while a robot vacuum is better left on a longer interval of its own.
+fresh reading, unlike HomeKit. Lower `pollingInterval` if the default 10 seconds feels sluggish: 1 second is comfortable
+for mains-powered devices, and fractions down to `0.5` are accepted — though below a second the controller's own latency
+dominates, so the extra traffic buys little. A robot vacuum is better left on a longer interval of its own.
 
 Apple Home also has no concept for the sleep and favorite modes of a purifier, so they are reachable through the speed
 slider (`speedControl: "favorite"`) or as explicit switches (`modeControl: true`). For the same reason a fan advertises

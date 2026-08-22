@@ -112,9 +112,12 @@ export abstract class MiotAccessory<S extends DeviceSpec = DeviceSpec> {
 
     await this.poll();
 
-    this.pollTimer = setInterval(() => {
-      void this.poll();
-    }, this.config.pollingInterval * 1000);
+    this.pollTimer = setInterval(
+      () => {
+        void this.poll();
+      },
+      Math.round(this.config.pollingInterval * 1000),
+    );
     this.pollTimer.unref();
   }
 
