@@ -73,6 +73,12 @@
             "enum": ["favorite", "levels"],
             "default": "favorite"
           },
+          "autoModeSpeed": {
+            "description": "Air purifier: what to report as the speed in automatic mode. \"zero\" shows Idle on the Apple Home tile, \"actual\" shows the current motor level as a number.",
+            "type": "string",
+            "enum": ["zero", "actual"],
+            "default": "zero"
+          },
           "buzzerControl": {
             "description": "Expose the beeper as a switch.",
             "type": "boolean",

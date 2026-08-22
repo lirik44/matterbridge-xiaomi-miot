@@ -67,6 +67,14 @@ export interface DeviceConfig {
    */
   separateSensors?: boolean;
   /**
+   * What an air purifier reports as its speed while in automatic mode.
+   *
+   * `zero` reports 0 %, which Apple Home renders as `Idle`; `actual` reports the
+   * level the motor is running at, which Apple Home renders as a number. Apple
+   * never writes `Auto` on the tile itself — that only shows inside the card.
+   */
+  autoModeSpeed?: 'zero' | 'actual';
+  /**
    * How the speed slider maps onto the air purifier.
    * `favorite` uses the fine grained favorite level (12 steps), `levels` uses
    * the three manual fan levels.
@@ -149,6 +157,7 @@ export function resolveDeviceConfig(config: DeviceConfig, platformConfig: Xiaomi
     filterControl: config.filterControl ?? true,
     separateSensors: config.separateSensors ?? true,
     speedControl: config.speedControl ?? 'favorite',
+    autoModeSpeed: config.autoModeSpeed ?? 'zero',
     debug: config.debug ?? platformConfig.debug ?? false,
   };
 }

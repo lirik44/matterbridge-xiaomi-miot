@@ -149,29 +149,30 @@ Add your devices to the `devices` array, either through the Matterbridge UI or d
 
 #### Per-device options
 
-| Option             | Default    | Effect                                                                                                                 |
-| ------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `name`             | –          | Required. The name shown in the controller app.                                                                        |
-| `ip`               | –          | Required. Give the device a static lease on your router.                                                               |
-| `token`            | –          | Required. 32 hexadecimal characters.                                                                                   |
-| `model`            | auto       | The MIoT model. When omitted the device is asked, which requires it to be online at startup.                           |
-| `deviceId`         | –          | Used as the Matter serial number. Setting it keeps the device identity stable even when it is offline at startup.      |
-| `pollingInterval`  | `10`       | How often the device is polled, in seconds.                                                                            |
-| `deviceEnabled`    | `true`     | Set to `false` to skip the device without deleting its configuration.                                                  |
-| `sensorsControl`   | `true`     | Air purifier: expose air quality, PM2.5/PM10, temperature and humidity.                                                |
-| `separateSensors`  | `true`     | Air purifier: expose the sensors as their own bridged device. Required for Apple Home.                                 |
-| `filterControl`    | `true`     | Air purifier: expose the remaining HEPA filter life.                                                                   |
-| `speedControl`     | `favorite` | Air purifier: `favorite` maps the speed slider onto the 12-step favorite level, `levels` onto the 3 manual fan levels. |
-| `buzzerControl`    | `false`    | Expose the beeper as a switch.                                                                                         |
-| `ledControl`       | `false`    | Expose the display / indicator light as a switch.                                                                      |
-| `childLockControl` | `false`    | Expose the physical controls lock as a switch.                                                                         |
-| `modeControl`      | `false`    | Expose the operating modes as switches (purifier: auto/sleep/favorite/manual, fan: straight/natural wind).             |
-| `swingControl`     | `false`    | Fan: expose the oscillation as a separate switch (Apple Home hides it in the accessory settings).                      |
-| `ionizerControl`   | `false`    | Air purifier: expose the ionizer as a switch.                                                                          |
-| `sceneControl`     | `false`    | Light: expose the built-in scenes as momentary switches.                                                               |
-| `roomIds`          | –          | Vacuum: segment ids of the rooms to expose as service areas.                                                           |
-| `roomNames`        | –          | Vacuum: room names, in the same order as `roomIds`.                                                                    |
-| `debug`            | `false`    | Debug logging for this device only.                                                                                    |
+| Option             | Default    | Effect                                                                                                                     |
+| ------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `name`             | –          | Required. The name shown in the controller app.                                                                            |
+| `ip`               | –          | Required. Give the device a static lease on your router.                                                                   |
+| `token`            | –          | Required. 32 hexadecimal characters.                                                                                       |
+| `model`            | auto       | The MIoT model. When omitted the device is asked, which requires it to be online at startup.                               |
+| `deviceId`         | –          | Used as the Matter serial number. Setting it keeps the device identity stable even when it is offline at startup.          |
+| `pollingInterval`  | `10`       | How often the device is polled, in seconds.                                                                                |
+| `deviceEnabled`    | `true`     | Set to `false` to skip the device without deleting its configuration.                                                      |
+| `sensorsControl`   | `true`     | Air purifier: expose air quality, PM2.5/PM10, temperature and humidity.                                                    |
+| `separateSensors`  | `true`     | Air purifier: expose the sensors as their own bridged device. Required for Apple Home.                                     |
+| `filterControl`    | `true`     | Air purifier: expose the remaining HEPA filter life.                                                                       |
+| `speedControl`     | `favorite` | Air purifier: `favorite` maps the speed slider onto the 12-step favorite level, `levels` onto the 3 manual fan levels.     |
+| `autoModeSpeed`    | `zero`     | Air purifier: what the speed reads in automatic mode. `zero` shows `Idle` on the Apple Home tile, `actual` shows a number. |
+| `buzzerControl`    | `false`    | Expose the beeper as a switch.                                                                                             |
+| `ledControl`       | `false`    | Expose the display / indicator light as a switch.                                                                          |
+| `childLockControl` | `false`    | Expose the physical controls lock as a switch.                                                                             |
+| `modeControl`      | `false`    | Expose the operating modes as switches (purifier: auto/sleep/favorite/manual, fan: straight/natural wind).                 |
+| `swingControl`     | `false`    | Fan: expose the oscillation as a separate switch (Apple Home hides it in the accessory settings).                          |
+| `ionizerControl`   | `false`    | Air purifier: expose the ionizer as a switch.                                                                              |
+| `sceneControl`     | `false`    | Light: expose the built-in scenes as momentary switches.                                                                   |
+| `roomIds`          | –          | Vacuum: segment ids of the rooms to expose as service areas.                                                               |
+| `roomNames`        | –          | Vacuum: room names, in the same order as `roomIds`.                                                                        |
+| `debug`            | `false`    | Debug logging for this device only.                                                                                        |
 
 Every enabled `*Control` flag adds one more bridged device, which shows up as its own tile in the controller app. With
 all flags off, a device is a single tile — plus the sensor device for a purifier.

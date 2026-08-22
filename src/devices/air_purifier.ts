@@ -199,10 +199,10 @@ export class AirPurifierAccessory extends MiotAccessory<AirPurifierSpec> {
     await this.main.updateAttribute(OnOff.Cluster.id, 'onOff', on, this.log);
 
     const auto = this.read('mode') === this.spec.modes.auto;
-    // In automatic mode the speed is the device's business, so it is reported as
-    // zero rather than as the level the motor happens to run at — the same thing
-    // `homebridge-miot` shows, and it keeps the slider out of the way.
-    const percent = !on || auto ? 0 : this.currentPercent();
+    // In automatic mode the speed is the device's business. Reporting zero makes
+    // Apple Home show `Idle` (what `homebridge-miot` does); reporting the actual
+    // level makes it show a number. See `autoModeSpeed`.
+    const percent = !on || (auto && this.config.autoModeSpeed === 'zero') ? 0 : this.currentPercent();
     const fanMode = !on ? FanControl.FanMode.Off : auto ? FanControl.FanMode.Auto : percentToFanMode(percent);
 
     await this.main.updateAttribute(FanControl.Cluster.id, 'percentCurrent', percent, this.log);
