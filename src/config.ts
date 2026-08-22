@@ -35,6 +35,14 @@ export interface DeviceConfig {
   ionizerControl?: boolean;
   /** Expose the natural wind mode as a switch (fan only, in addition to the wind setting). */
   naturalModeControl?: boolean;
+  /**
+   * Expose the oscillation as a switch (fan only).
+   *
+   * The oscillation is always available through the fan control cluster, but Apple
+   * Home buries it in the accessory settings; a switch gets it onto the tile grid
+   * and into automations.
+   */
+  swingControl?: boolean;
   /** Expose the built-in scenes as momentary switches (light only). */
   sceneControl?: boolean;
 
@@ -127,6 +135,7 @@ export function resolveDeviceConfig(config: DeviceConfig, platformConfig: Xiaomi
     modeControl: config.modeControl ?? false,
     ionizerControl: config.ionizerControl ?? false,
     naturalModeControl: config.naturalModeControl ?? false,
+    swingControl: config.swingControl ?? false,
     sceneControl: config.sceneControl ?? false,
     sensorsControl: config.sensorsControl ?? true,
     filterControl: config.filterControl ?? true,

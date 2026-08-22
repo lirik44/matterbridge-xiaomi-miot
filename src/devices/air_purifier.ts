@@ -99,21 +99,35 @@ export class AirPurifierAccessory extends MiotAccessory<AirPurifierSpec> {
     }
   }
 
-  /** Exposes the sensors as a single extra bridged device, which Apple Home renders. */
+  /**
+   * Exposes each sensor as its own bridged device.
+   *
+   * Apple Home shows only the primary type of a device, so temperature and
+   * humidity have to be their own devices to get a tile each — putting them on
+   * the air quality device makes them invisible there.
+   */
   private buildSeparateSensors(): void {
-    const endpoint = this.createEndpoint([airQualitySensor, bridgedNode, powerSource], 'Air Quality', 'AQ');
-    endpoint.createDefaultIdentifyClusterServer().createDefaultAirQualityClusterServer(AirQuality.AirQualityEnum.Unknown);
+    const airQuality = this.createEndpoint([airQualitySensor, bridgedNode, powerSource], 'Air Quality', 'AQ');
+    airQuality.createDefaultIdentifyClusterServer().createDefaultAirQualityClusterServer(AirQuality.AirQualityEnum.Unknown);
+    if (this.spec.props.pm25) airQuality.createDefaultPm25ConcentrationMeasurementClusterServer(null);
+    if (this.spec.props.pm10) airQuality.createDefaultPm10ConcentrationMeasurementClusterServer(null);
+    airQuality.addRequiredClusterServers();
+    this.endpoints.push(airQuality);
+    this.airQuality = airQuality;
 
-    if (this.spec.props.pm25) endpoint.createDefaultPm25ConcentrationMeasurementClusterServer(null);
-    if (this.spec.props.pm10) endpoint.createDefaultPm10ConcentrationMeasurementClusterServer(null);
-    if (this.spec.props.temperature) endpoint.createDefaultTemperatureMeasurementClusterServer(null);
-    if (this.spec.props.humidity) endpoint.createDefaultRelativeHumidityMeasurementClusterServer(null);
-    endpoint.addRequiredClusterServers();
+    if (this.spec.props.temperature) {
+      const temperature = this.createEndpoint([temperatureSensor, bridgedNode, powerSource], 'Temperature', 'TEMP');
+      temperature.createDefaultIdentifyClusterServer().createDefaultTemperatureMeasurementClusterServer(null).addRequiredClusterServers();
+      this.endpoints.push(temperature);
+      this.temperature = temperature;
+    }
 
-    this.endpoints.push(endpoint);
-    this.airQuality = endpoint;
-    if (this.spec.props.temperature) this.temperature = endpoint;
-    if (this.spec.props.humidity) this.humidity = endpoint;
+    if (this.spec.props.humidity) {
+      const humidity = this.createEndpoint([humiditySensor, bridgedNode, powerSource], 'Humidity', 'HUM');
+      humidity.createDefaultIdentifyClusterServer().createDefaultRelativeHumidityMeasurementClusterServer(null).addRequiredClusterServers();
+      this.endpoints.push(humidity);
+      this.humidity = humidity;
+    }
   }
 
   /** Exposes the sensors as child endpoints of the purifier itself. */
@@ -184,8 +198,12 @@ export class AirPurifierAccessory extends MiotAccessory<AirPurifierSpec> {
     const on = this.read('power') === true;
     await this.main.updateAttribute(OnOff.Cluster.id, 'onOff', on, this.log);
 
-    const percent = on ? this.currentPercent() : 0;
-    const fanMode = !on ? FanControl.FanMode.Off : this.read('mode') === this.spec.modes.auto ? FanControl.FanMode.Auto : percentToFanMode(percent);
+    const auto = this.read('mode') === this.spec.modes.auto;
+    // In automatic mode the speed is the device's business, so it is reported as
+    // zero rather than as the level the motor happens to run at — the same thing
+    // `homebridge-miot` shows, and it keeps the slider out of the way.
+    const percent = !on || auto ? 0 : this.currentPercent();
+    const fanMode = !on ? FanControl.FanMode.Off : auto ? FanControl.FanMode.Auto : percentToFanMode(percent);
 
     await this.main.updateAttribute(FanControl.Cluster.id, 'percentCurrent', percent, this.log);
     await this.main.updateAttribute(FanControl.Cluster.id, 'percentSetting', percent, this.log);

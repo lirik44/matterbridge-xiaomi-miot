@@ -166,6 +166,7 @@ Add your devices to the `devices` array, either through the Matterbridge UI or d
 | `ledControl`       | `false`    | Expose the display / indicator light as a switch.                                                                      |
 | `childLockControl` | `false`    | Expose the physical controls lock as a switch.                                                                         |
 | `modeControl`      | `false`    | Expose the operating modes as switches (purifier: auto/sleep/favorite/manual, fan: straight/natural wind).             |
+| `swingControl`     | `false`    | Fan: expose the oscillation as a separate switch (Apple Home hides it in the accessory settings).                      |
 | `ionizerControl`   | `false`    | Air purifier: expose the ionizer as a switch.                                                                          |
 | `sceneControl`     | `false`    | Light: expose the built-in scenes as momentary switches.                                                               |
 | `roomIds`          | –          | Vacuum: segment ids of the rooms to expose as service areas.                                                           |
@@ -210,9 +211,18 @@ try again:
 
 ## Apple Home notes
 
-Apple Home does not render the child endpoints of a composed device, which is why the purifier sensors default to being
-exposed as their own device (`separateSensors: true`). Set it to `false` for Google Home or Home Assistant, which prefer
+Apple Home does not render the child endpoints of a composed device, and it shows only the primary type of a device.
+Purifier sensors are therefore exposed as three separate devices — air quality (with PM2.5/PM10), temperature and
+humidity — which is what `separateSensors: true` does. Set it to `false` for Google Home or Home Assistant, which prefer
 a single composed device.
+
+Two things Apple Home does not offer for Matter devices, no matter what the plugin advertises: the speed is rendered as
+a bare number rather than a percentage, and the oscillation lives in the accessory settings instead of on the tile
+(`swingControl: true` adds a switch tile as a workaround). A HomeKit bridge such as Homebridge shows both, because
+HomeKit has dedicated characteristics for them.
+
+State changes made on the device itself appear after the next poll — Matter has no way for a controller to ask for a
+fresh reading, unlike HomeKit. Lower `pollingInterval` to 3 seconds if the default 10 feels sluggish.
 
 Apple Home also has no concept for the sleep and favorite modes of a purifier, so they are reachable through the speed
 slider (`speedControl: "favorite"`) or as explicit switches (`modeControl: true`). For the same reason a fan advertises

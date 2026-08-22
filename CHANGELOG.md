@@ -11,6 +11,17 @@ All notable changes to this project are documented in this file.
   pause, resume, return to dock, suction and mop levels as clean modes, battery state and the
   rooms declared through `roomIds`/`roomNames`.
 
+### Changed
+
+- Air purifier sensors are exposed as three separate devices (air quality, temperature, humidity) instead of one
+  combined air quality device, so Apple Home shows a tile for each.
+- An air purifier in automatic mode reports 0 % instead of the level its motor happens to run at.
+
+### Added
+
+- `swingControl` exposes a fan's oscillation as its own switch, since Apple Home hides the fan control cluster's
+  rocking setting in the accessory settings.
+
 ### Fixed
 
 - A docked robot is reported as docked or charging instead of stopped: Dreame signals the dock

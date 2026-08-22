@@ -93,6 +93,11 @@
             "type": "boolean",
             "default": false
           },
+          "swingControl": {
+            "description": "Fan: expose the oscillation as a separate switch (Apple Home otherwise hides it in the accessory settings).",
+            "type": "boolean",
+            "default": false
+          },
           "ionizerControl": {
             "description": "Air purifier: expose the ionizer as a switch.",
             "type": "boolean",

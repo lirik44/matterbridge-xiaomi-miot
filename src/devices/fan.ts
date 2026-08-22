@@ -72,6 +72,7 @@ export class FanAccessory extends MiotAccessory<FanSpec> {
     this.endpoint.addRequiredClusterServers();
     this.endpoints.push(this.endpoint);
 
+    if (this.config.swingControl) this.addBoundSwitch('swing', 'Oscillate', 'SWG');
     if (this.config.buzzerControl) this.addBoundSwitch('buzzer', 'Buzzer', 'BUZ');
     if (this.config.ledControl) this.addBoundSwitch('led', 'Display', 'LED', this.spec.ledValues ?? { on: true, off: false });
     if (this.config.childLockControl) this.addBoundSwitch('childLock', 'Child Lock', 'LOCK');
