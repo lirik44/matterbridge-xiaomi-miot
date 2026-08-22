@@ -100,8 +100,14 @@ export type ResolvedDeviceConfig = Required<Omit<DeviceConfig, 'model' | 'device
 /** The default polling interval, in seconds. */
 export const DEFAULT_POLLING_INTERVAL = 10;
 
-/** The shortest polling interval accepted, in seconds. */
-const MIN_POLLING_INTERVAL = 2;
+/**
+ * The shortest polling interval accepted, in seconds.
+ *
+ * One second is fine on a wired LAN — a MIoT read takes tens of milliseconds and
+ * overlapping polls are skipped rather than queued. Battery devices are better
+ * off with their own, longer interval.
+ */
+const MIN_POLLING_INTERVAL = 1;
 
 /**
  * Applies the defaults to a device configuration and validates the required fields.
