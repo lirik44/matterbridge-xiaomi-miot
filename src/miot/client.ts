@@ -32,6 +32,14 @@ const RECONNECT_DELAY_MS = 10_000;
 const HANDSHAKE_OPTIONS = { attempts: 2, delay: 1000, timeout: 3000 };
 
 /**
+ * Options for the property and action calls.
+ *
+ * A robot vacuum asleep on its dock regularly needs more than the 3 s the
+ * `miio-api` default allows, which surfaced as spurious poll timeouts.
+ */
+const CALL_OPTIONS = { attempts: 2, delay: 1000, timeout: 5000 };
+
+/**
  * A thin MIoT client on top of the local miIO protocol.
  *
  * The client owns a single `miio-api` device, re-creating it whenever the
@@ -187,7 +195,7 @@ export class MiotClient {
   private async call<T>(method: string, params: unknown[]): Promise<T> {
     const device = await this.connect();
     try {
-      return await device.call<unknown[], T>(method, params);
+      return await device.call<unknown[], T>(method, params, CALL_OPTIONS);
     } catch (error) {
       if (this.isTransportError(error)) {
         this.log.warn(`${this.options.name} | ${method} failed (${String(error)}), reconnecting...`);

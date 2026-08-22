@@ -11,6 +11,13 @@ All notable changes to this project are documented in this file.
   pause, resume, return to dock, suction and mop levels as clean modes, battery state and the
   rooms declared through `roomIds`/`roomNames`.
 
+### Fixed
+
+- A docked robot is reported as docked or charging instead of stopped: Dreame signals the dock
+  through `charging_state` while `device_status` stays `Idle`.
+- Property and action calls wait up to 5 s, so a vacuum asleep on its dock no longer produces
+  spurious poll timeouts.
+
 ## [0.1.0] - 2026-08-21
 
 Initial release.

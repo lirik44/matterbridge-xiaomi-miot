@@ -181,6 +181,12 @@ export class VacuumAccessory extends MiotAccessory<VacuumSpec> {
       return 'idle';
     }
 
+    // A docked Dreame reports `Idle` and signals the dock through `charging_state`
+    // instead, so the charging state has the last word when the robot is not busy.
+    if ((mapped === 'idle' || mapped === 'sleeping') && this.isCharging()) {
+      return this.batteryLevel() >= 100 ? 'fully-charged' : 'charging';
+    }
+
     if (mapped === 'charging' && this.batteryLevel() >= 100) return 'fully-charged';
     return mapped;
   }

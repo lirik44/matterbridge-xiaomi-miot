@@ -57,13 +57,13 @@ Everything above works locally. There is no cloud fallback.
 | Xiaomi Smart Air Purifier 4 Pro | `zhimi.airp.vb4`                                     | Air purifier + air quality sensor (PM2.5, PM10, temp, humidity) | ✅ &nbsp;@lirik44 |
 | Xiaomi Smart Air Purifier 4     | `zhimi.airp.mb5`                                     | Air purifier + air quality sensor (PM2.5, temp, humidity)       | ✅ &nbsp;@lirik44 |
 | Mi LED Desk Lamp 1S             | `yeelink.light.lamp4`                                | Color temperature light (2600–5000 K)                           | ✅ &nbsp;@lirik44 |
-| Dreame F9                       | `dreame.vacuum.p2008`                                | Robotic vacuum cleaner                                          |        ❔         |
+| Dreame F9                       | `dreame.vacuum.p2008`                                | Robotic vacuum cleaner                                          | ✅ &nbsp;@lirik44 |
 | Dreame D9                       | `dreame.vacuum.p2009`                                | Robotic vacuum cleaner                                          |        ❔         |
 | Dreame Z10 Pro                  | `dreame.vacuum.p2028`                                | Robotic vacuum cleaner                                          |        ❔         |
 | Dreame Mop 2 Pro+ / Ultra / 2   | `dreame.vacuum.p2041o` &nbsp;`p2150a` &nbsp;`p2150o` | Robotic vacuum cleaner                                          |        ❔         |
 
-Verified means read _and_ write were exercised against the real device on firmware `2.1.3` (fan), `2.2.7` (purifiers)
-and `2.1.7_0020` (lamp), with Matterbridge 3.10.5 on Node 22.
+Verified means read _and_ write were exercised against the real device on firmware `2.1.3` (fan), `2.2.7` (purifiers),
+`2.1.7_0020` (lamp) and `4.1.8_1107` (Dreame F9), with Matterbridge 3.10.5 on Node 22.
 
 An unlisted `dreame.vacuum.*` model falls back to the F9 mapping, since Dreame publishes near-identical specifications
 across its vacuum line; the plugin logs that it is guessing.
